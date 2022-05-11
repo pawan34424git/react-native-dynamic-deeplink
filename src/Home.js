@@ -54,12 +54,14 @@ const Home = ({navigation}) => {
     Linking.getInitialURL().then(url => {
       navigateHandler(url);
     });
+
+    let addEventListener;
     if (Platform.OS === 'ios') {
-      Linking.addEventListener('url', handleOpenURL);
+      addEventListener = Linking.addEventListener('url', handleOpenURL);
     }
     return () => {
-      if (Platform.OS === 'ios') {
-        Linking.removeEventListener('url', handleOpenURL);
+      if (addEventListener) {
+        addEventListener.remove();
       }
     };
   });
@@ -69,11 +71,17 @@ const Home = ({navigation}) => {
   };
   const navigateHandler = async url => {
     if (url) {
+      console.log('url', url);
       const {navigate} = navigation;
       const route = url.replace(/.*?:\/\//g, '');
+      console.log('route', route);
       const id = route.match(/\/([^/]+)\/?$/)[1];
-      const post = posts.find(item => item.id === id);
-      navigate('Post', {post: post});
+      console.log('id', id);
+
+      const post = posts.find(item => item.id === Number(id));
+      console.log('Post', post);
+
+      post && navigate('Post', {post: post});
     }
   };
   const {row, image, title, separator, container} = styles;
